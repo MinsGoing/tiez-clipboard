@@ -1,7 +1,5 @@
 /* Shared geometry follows the established macOS layout for every platform and theme. */
 html:root .brand-mark {
-  height: 16px;
-  width: 46px;
   margin-left: 6px;
 }
 

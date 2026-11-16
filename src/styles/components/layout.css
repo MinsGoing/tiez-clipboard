@@ -72,20 +72,20 @@ header {
 
 .brand-mark {
   display: block;
-  height: 15px;
-  width: 42px;
   margin-left: 2px;
   flex: 0 0 auto;
-  background-color: var(--brand-mark-color, var(--accent-color));
-  /* Keep the brand color theme-aware, but slightly quieter than the accent
-     used for actions so the logo does not compete with the content. */
-  background-color: color-mix(
+  color: var(--brand-mark-color, var(--accent-color));
+  color: color-mix(
     in srgb,
     var(--brand-mark-color, var(--accent-color)) 88%,
     rgb(var(--shadow-rgb)) 12%
   );
-  -webkit-mask: url("../../assets/tiez-wordmark.svg") left center / contain no-repeat;
-  mask: url("../../assets/tiez-wordmark.svg") left center / contain no-repeat;
+  font-family: var(--title-font-family);
+  font-size: 17px; /* design-ok: readable LocalClip wordmark */
+  font-weight: 800;
+  line-height: 1;
+  letter-spacing: -0.35px;
+  white-space: nowrap;
   pointer-events: none;
   -webkit-user-select: none;
   user-select: none;
@@ -249,8 +249,7 @@ header {
   }
 
   .brand-mark {
-    height: 13px;
-    width: 36px;
+    font-size: 14px; /* design-ok: compact brand text */
   }
 
   .header-drag-region {

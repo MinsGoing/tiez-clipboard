@@ -217,7 +217,7 @@ const AppHeader = ({
           {showSettings || showTagManager || showEmojiPanel ? (
             <span className="header-title page-header-title is-page-title">{headerTitle}</span>
           ) : (
-            <span className="brand-mark" role="img" aria-label={t("app_name")} />
+            <span className="brand-mark">{t("app_name")}</span>
           )}
         </div>
 
