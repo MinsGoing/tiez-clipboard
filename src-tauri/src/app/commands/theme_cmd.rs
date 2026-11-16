@@ -423,40 +423,10 @@ pub async fn install_theme_from_store(
     theme_id: String,
     data_dir: State<'_, AppDataDir>,
 ) -> AppResult<InstalledTheme> {
-    let package_id = theme_id
-        .strip_prefix("store-")
-        .ok_or_else(|| AppError::Validation("主题标识不正确，请重新选择主题。".to_string()))?;
-    validate_theme_id(package_id)?;
-
-    let package_url = format!(
-        "{}/api/v1/themes/{}/package",
-        crate::build_config::theme_store_base_url(),
-        theme_id
-    );
-    let package = download_limited(&package_url, MAX_ARCHIVE_SIZE as usize).await?;
-    let data_root = {
-        let data_dir = data_dir
-            .0
-            .lock()
-            .map_err(|_| AppError::Internal("无法打开数据位置，请检查访问权限。".to_string()))?;
-        data_dir.clone()
-    };
-    let download_directory = themes_dir(&data_root);
-    fs::create_dir_all(&download_directory).map_err(AppError::from)?;
-    let temporary_package = download_directory.join(format!(".download-{}.zip", Uuid::new_v4()));
-    fs::write(&temporary_package, package).map_err(AppError::from)?;
-
-    let result = (|| -> AppResult<InstalledTheme> {
-        let (metadata, files) = read_package(&temporary_package)?;
-        if installed_id(&metadata.id) != theme_id {
-            return Err(AppError::Validation(
-                "下载的文件与所选主题不同。\n请重新下载。".to_string(),
-            ));
-        }
-        install_validated_theme(metadata, files, &data_root)
-    })();
-    let _ = fs::remove_file(temporary_package);
-    result
+    let _ = (theme_id, data_dir);
+    Err(AppError::Validation(
+        "在线主题商店在 LocalClip 中不可用；请使用本地主题文件。".to_string(),
+    ))
 }
 
 #[tauri::command]

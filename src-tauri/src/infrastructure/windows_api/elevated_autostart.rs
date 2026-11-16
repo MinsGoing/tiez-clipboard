@@ -339,12 +339,12 @@ mod tests {
 
     #[test]
     fn task_runs_on_battery_without_time_limit() {
-        let xml = task_xml(r"C:\Program Files\R&D <LocalClip>\tiez-app.exe", r"PC\User");
+        let xml = task_xml(r"C:\Program Files\R&D <LocalClip>\localclip.exe", r"PC\User");
         assert!(xml.contains("<DisallowStartIfOnBatteries>false</DisallowStartIfOnBatteries>"));
         assert!(xml.contains("<StopIfGoingOnBatteries>false</StopIfGoingOnBatteries>"));
         assert!(xml.contains("<ExecutionTimeLimit>PT0S</ExecutionTimeLimit>"));
         assert!(xml.contains("<RunLevel>HighestAvailable</RunLevel>"));
-        assert!(xml.contains(r"<Command>C:\Program Files\R&amp;D &lt;LocalClip&gt;\tiez-app.exe</Command>"));
+        assert!(xml.contains(r"<Command>C:\Program Files\R&amp;D &lt;LocalClip&gt;\localclip.exe</Command>"));
         assert!(xml.contains(&format!("<Arguments>--minimized {TASK_ARG}</Arguments>")));
         assert!(xml.contains(r"<UserId>PC\User</UserId>"));
     }
@@ -353,7 +353,7 @@ mod tests {
     fn only_a_login_start_hands_off() {
         let args = |list: &[&str]| list.iter().map(|a| a.to_string()).collect::<Vec<_>>();
         // A manual start or one the task made never hands off.
-        assert!(!hand_off_to_task(&args(&["tiez-app.exe"])));
-        assert!(!hand_off_to_task(&args(&["tiez-app.exe", "--minimized", TASK_ARG])));
+        assert!(!hand_off_to_task(&args(&["localclip.exe"])));
+        assert!(!hand_off_to_task(&args(&["localclip.exe", "--minimized", TASK_ARG])));
     }
 }

@@ -161,7 +161,7 @@ pub(crate) fn default_app_data_dir<R: tauri::Runtime>(
     paths: &tauri::path::PathResolver<R>,
 ) -> tauri::Result<std::path::PathBuf> {
     let dir = paths.app_data_dir()?;
-    // `npm run tauri:dev` already uses the com.tiez.dev identifier; only a
+    // `npm run tauri:dev` already uses the com.minsgoing.localclip.dev identifier; only a
     // debug build run with the release config still needs the suffix.
     #[cfg(all(target_os = "macos", debug_assertions))]
     let dir = match dir.file_name().and_then(|n| n.to_str()) {
