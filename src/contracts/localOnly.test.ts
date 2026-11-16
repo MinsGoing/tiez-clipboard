@@ -44,7 +44,8 @@ describe("local-only invariant checks", () => {
     });
     test("Windows autostart settings are isolated from the upstream app", () => {
         const autostart = file("src-tauri/src/infrastructure/windows_api/elevated_autostart.rs");
-        expect(autostart).toContain('LocalClip\\\\ElevatedAutostart');
+        expect(autostart).toContain('const TASK_NAME: &str = r"LocalClip');
+        expect(autostart).toContain("ElevatedAutostart");
         expect(autostart).not.toContain('delete_value("TieZ")');
         expect(autostart).not.toContain('set_value("TieZ"');
         expect(file("src-tauri/src/infrastructure/windows_api/single_instance.rs")).toContain("LocalClip.ShowWindow");

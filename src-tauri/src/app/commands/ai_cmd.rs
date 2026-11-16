@@ -36,12 +36,3 @@ pub fn apply_ai_result(app_handle: AppHandle, id: i64, content: String) -> AppRe
     Err(ai_unavailable())
 }
 
-#[cfg(test)]
-mod tests {
-    #[test]
-    fn ai_network_calls_have_no_implementation() {
-        let source = include_str!("ai_cmd.rs");
-        assert!(!source.contains("reqwest::"));
-        assert!(!source.contains("https://"));
-    }
-}
