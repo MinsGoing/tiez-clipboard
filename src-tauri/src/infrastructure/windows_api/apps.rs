@@ -108,11 +108,11 @@ pub async fn scan_installed_apps() -> AppResult<Vec<AppInfo>> {
     // 2. Discover registered Win32 applications without starting PowerShell.
     // App Paths exposes executable locations, unlike StartApps AppIDs.
     // This intentionally excludes UWP-only entries that cannot be launched as an exe.
-    const app_paths_key = r"SOFTWARE\Microsoft\Windows\CurrentVersion\App Paths";
-    const wow64_paths_key = r"SOFTWARE\WOW6432Node\Microsoft\Windows\CurrentVersion\App Paths";
+    const APP_PATHS_KEY: &str = r"SOFTWARE\Microsoft\Windows\CurrentVersion\App Paths";
+    const WOW64_PATHS_KEY: &str = r"SOFTWARE\WOW6432Node\Microsoft\Windows\CurrentVersion\App Paths";
     for hive in [HKEY_CURRENT_USER, HKEY_LOCAL_MACHINE] {
         let registry_root = RegKey::predef(hive);
-        for key_name in [app_paths_key, wow64_paths_key] {
+        for key_name in [APP_PATHS_KEY, WOW64_PATHS_KEY] {
             let Ok(app_paths) = registry_root.open_subkey_with_flags(key_name, KEY_READ) else {
                 continue;
             };
