@@ -27,6 +27,15 @@ describe("local-only invariant checks", () => {
         expect(announcements).not.toContain("get_ping_id");
         expect(announcements).not.toContain("await fetch(");
     });
+    test("only local icon assets are loaded and no updater UI is mounted", () => {
+        const setup = file("src-tauri/src/app/setup.rs");
+        const app = file("src/App.tsx");
+        const source = file("src-tauri/icons/localclip.svg");
+        expect(setup).toContain('include_bytes!("../../icons/32x32.png")');
+        expect(source).toContain("#072677");
+        expect(app).not.toContain("useAutoUpdate");
+        expect(app).not.toContain("<UpdateDialog");
+    });
     test("upstream updater is absent", () => {
         const config = JSON.parse(file("src-tauri/tauri.conf.json"));
         expect(config.plugins.updater).toBeUndefined();

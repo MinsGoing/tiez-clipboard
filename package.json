@@ -22,8 +22,8 @@
     "apply-version:win": "node scripts/apply-app-version.mjs windows",
     "validate-release": "node scripts/validate-release.mjs",
     "validate-release-matrix": "node scripts/validate-release-matrix.mjs",
-    "build:icon:mac": "swift scripts/build-macos-icon.swift",
-    "build:icon:win": "swift scripts/build-windows-icon.swift",
+    "build:icon:mac": "node scripts/generate-localclip-icons.mjs",
+    "build:icon:win": "node scripts/generate-localclip-icons.mjs",
     "build:theme:retro": "node scripts/build-retro-theme-package.mjs",
     "release:stable:win": "node scripts/build-release.mjs windows stable",
     "release:stable:mac": "node scripts/build-release.mjs macos stable",
@@ -39,7 +39,8 @@
     "release": "set -a && . ./.env && set +a && node scripts/apply-app-version.mjs macos && tauri build",
     "release:arm": "set -a && . ./.env && set +a && node scripts/apply-app-version.mjs macos && tauri build --target aarch64-apple-darwin",
     "release:intel": "set -a && . ./.env && set +a && node scripts/apply-app-version.mjs macos && tauri build --target x86_64-apple-darwin",
-    "release:all": "npm run release:arm && npm run release:intel"
+    "release:all": "npm run release:arm && npm run release:intel",
+    "prebuild": "node scripts/generate-localclip-icons.mjs"
   },
   "dependencies": {
     "@tauri-apps/api": "^2.11.1",

@@ -27,7 +27,7 @@ const SettingsFooter = ({ t, appVersion, onResetSettings }: SettingsFooterProps)
             <span>LocalClip {appVersion ? `v${appVersion}` : ""}</span>
         </div>
         <div className="settings-about-resources">
-            <p>基于 GPL-3.0 许可的 TieZ 项目修改；不是原作者的官方发行版。</p>
+            <p>基于 GPL-3.0 许可的开源项目修改；此版本独立维护，非原作者官方发行。</p>
             <button type="button" className="settings-about-link"
                 onClick={() => void openUrl("https://github.com/MinsGoing/tiez-clipboard")}>
                 <Github size={18} aria-hidden="true" />

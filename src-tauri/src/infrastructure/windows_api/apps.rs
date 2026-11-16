@@ -8,6 +8,8 @@ use std::os::windows::process::CommandExt;
 use std::path::Path;
 use std::process::Command;
 use std::sync::{Mutex, OnceLock};
+use winreg::enums::{HKEY_CURRENT_USER, HKEY_LOCAL_MACHINE, KEY_READ};
+use winreg::RegKey;
 use windows::core::{PCWSTR, PWSTR};
 use windows::Win32::Graphics::Gdi::{
     CreateCompatibleDC, CreateDIBSection, DeleteDC, DeleteObject, SelectObject, BITMAPINFO,
@@ -34,7 +36,6 @@ static FILE_ICON_CACHE: OnceLock<Mutex<HashMap<String, Option<String>>>> = OnceL
 
 pub async fn scan_installed_apps() -> AppResult<Vec<AppInfo>> {
     let mut apps = Vec::new();
-    println!("Starting app scan...");
 
     // 1. Add known system apps directly (Backend Fallback)
     let sys_root = std::env::var("SystemRoot").unwrap_or("C:\\Windows".to_string());
@@ -104,46 +105,38 @@ pub async fn scan_installed_apps() -> AppResult<Vec<AppInfo>> {
         });
     }
 
-    // 2. Run PowerShell Scan (Best Effort)
-    let ps_script = r#"
-        $ErrorActionPreference = 'SilentlyContinue'
-        [Console]::OutputEncoding = [System.Text.Encoding]::UTF8
-        
-        $apps = Get-StartApps | Select-Object Name, AppID
-        
-        $results = New-Object System.Collections.Generic.List[Object]
-        foreach ($app in $apps) {
-            if (![string]::IsNullOrEmpty($app.AppID)) {
-                $obj = @{ name = $app.Name; path = $app.AppID }
-                $results.Add($obj)
-            }
-        }
-        
-        if ($results.Count -eq 0) {
-            Write-Output "[]"
-        } else {
-            $results | ConvertTo-Json -Depth 2 -Compress
-        }
-    "#;
-
-    let output_res = Command::new("powershell")
-        .args([
-            "-NoProfile",
-            "-ExecutionPolicy",
-            "Bypass",
-            "-Command",
-            ps_script,
-        ])
-        .creation_flags(0x08000000) // CREATE_NO_WINDOW
-        .output();
-
-    if let Ok(output) = output_res {
-        if output.status.success() {
-            let json_str = String::from_utf8_lossy(&output.stdout);
-            if let Ok(scanned) = serde_json::from_str::<Vec<AppInfo>>(&json_str) {
-                apps.extend(scanned);
-            } else if let Ok(single) = serde_json::from_str::<AppInfo>(&json_str) {
-                apps.push(single);
+    // 2. Discover registered Win32 applications without starting PowerShell.
+    // App Paths exposes executable locations, unlike StartApps AppIDs.
+    // This intentionally excludes UWP-only entries that cannot be launched as an exe.
+    const app_paths_key = r"SOFTWARE\Microsoft\Windows\CurrentVersion\App Paths";
+    const wow64_paths_key = r"SOFTWARE\WOW6432Node\Microsoft\Windows\CurrentVersion\App Paths";
+    for hive in [HKEY_CURRENT_USER, HKEY_LOCAL_MACHINE] {
+        let registry_root = RegKey::predef(hive);
+        for key_name in [app_paths_key, wow64_paths_key] {
+            let Ok(app_paths) = registry_root.open_subkey_with_flags(key_name, KEY_READ) else {
+                continue;
+            };
+            for executable in app_paths.enum_keys().flatten() {
+                let Ok(entry) = app_paths.open_subkey_with_flags(&executable, KEY_READ) else {
+                    continue;
+                };
+                let Ok(raw_path) = entry.get_value::<String, _>("") else {
+                    continue;
+                };
+                let path = raw_path.trim().trim_matches('"');
+                if !path.to_ascii_lowercase().ends_with(".exe") || !Path::new(path).is_file() {
+                    continue;
+                }
+                let Some(name) = Path::new(&executable)
+                    .file_stem()
+                    .and_then(|stem| stem.to_str())
+                    .filter(|name| !name.trim().is_empty()) else {
+                    continue;
+                };
+                apps.push(AppInfo {
+                    name: name.to_string(),
+                    path: path.to_string(),
+                });
             }
         }
     }

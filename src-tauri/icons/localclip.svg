@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-label="LocalClip icon">
+  <!-- Transparent outside the tile; opaque navy tile stays visible on light and dark taskbars. -->
+  <rect x="8" y="8" width="496" height="496" rx="116" fill="#072677"/>
+  <!-- Second clipboard/page conveys local clipboard history. -->
+  <rect x="173" y="174" width="257" height="289" rx="49" fill="#FFA116"/>
+  <rect x="84" y="112" width="325" height="327" rx="60" fill="#00E5BD"/>
+  <rect x="111" y="142" width="270" height="269" rx="37" fill="#072677"/>
+  <rect x="127" y="160" width="239" height="233" rx="27" fill="#F7FBFF"/>
+  <rect x="174" y="96" width="168" height="82" rx="30" fill="#00E5BD"/>
+  <circle cx="258" cy="119" r="19" fill="#072677"/>
+  <path d="M172 230h168" stroke="#5AABF5" stroke-width="25" stroke-linecap="round"/>
+  <path d="M172 286h168" stroke="#5AABF5" stroke-width="25" stroke-linecap="round"/>
+  <path d="M172 342h120" stroke="#5AABF5" stroke-width="25" stroke-linecap="round"/>
+</svg>
