@@ -11,18 +11,19 @@ LocalClip is a **local-first clipboard manager** for Windows, based on the open-
 - Global shortcuts, customizable appearance, light/dark themes and privacy masking
 - Local data storage and backup / import tools
 - Optional LAN file transfer, enabled from Settings
+- Installed Win32 app discovery through the Windows registry, without invoking PowerShell Get-StartApps
 
 ## Changes from upstream
 
 This edition removes the **AI assistant**, **MQTT/verification-code synchronization** and **WebDAV/cloud synchronization** interfaces, and disables their backend requests. It also disables the upstream announcement ping, analytics reporting and automatic updater. These features are **not available** in this edition.
 
-LAN file transfer remains available as an opt-in feature. Other actions such as opening external links, fetching online themes or previewing remote content can still access the network. This is not an offline sandbox.
+LAN file transfer remains available as an opt-in feature. Other actions such as opening external links, rendering remote content can still access the network. This is not an offline sandbox.
 
 ## Download and installation
 
 Download the Windows x64 installer from **[Releases in this fork](https://github.com/MinsGoing/tiez-clipboard/releases)**. Initial builds are designated *preview* and are published only after the Windows build and automated checks pass. No installer is provided by the upstream project's website for this fork.
 
-The installer is not code-signed; Windows may display a publisher/SmartScreen warning. Verify the downloadable SHA-256 checksum before installing. The application ID is `com.minsgoing.localclip`, distinct from upstream TieZ.
+The installer and taskbar/tray icon use a new high-contrast LocalClip clipboard design. The installer is not code-signed; Windows may display a publisher/SmartScreen warning. Verify the downloadable SHA-256 checksum before installing. The application ID is `com.minsgoing.localclip` and the Windows executable is `localclip.exe`, separate from upstream TieZ.
 
 ## Build from source
 

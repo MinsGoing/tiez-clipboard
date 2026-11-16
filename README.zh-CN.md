@@ -11,12 +11,13 @@ LocalClip 是基于开源项目 [TieZ](https://github.com/jimuzhe/tiez-clipboard
 - 全局快捷键、外观主题、明暗模式和敏感内容预览遮罩
 - 本地数据存储、备份与导入
 - 可在设置中**主动开启**的局域网文件传输
+- 用 Windows 注册表 App Paths 枚举 Win32 软件，不再执行 PowerShell Get-StartApps
 
 ## 与原版的区别
 
 这个分支已移除 **AI 助手**、**MQTT／验证码同步**、**WebDAV／云同步**的相关设置入口，并在后端禁用相应联网请求；同时停用原作者服务器的公告请求、匿名统计和自动更新功能。
 
-**并非完全离线软件。** 主动启用局域网互传、打开网页、使用在线主题或预览远程内容时仍可能联网。此前已开启局域网服务的设置可能继续生效。
+**并非完全离线软件。** 主动启用局域网互传、打开网页或预览远程内容时仍可能联网。原作者的在线主题商店已停用。此前已开启局域网服务的设置可能继续生效。
 
 ## 下载与安装
 
@@ -24,7 +25,7 @@ LocalClip 是基于开源项目 [TieZ](https://github.com/jimuzhe/tiez-clipboard
 
 首个版本以 *Preview（预览版）* 发布，只有在 Windows 构建及自动化检查成功后才会提供安装包。此版本没有商业代码签名证书，安装时 Windows 可能出现未知发布者或 SmartScreen 提示；请先核对 Release 同时提供的 SHA-256 校验值。
 
-程序标识为 `com.minsgoing.localclip`，与原版 TieZ 不同。
+程序标识为 `com.minsgoing.localclip`，Windows 程序名为 `localclip.exe`，与原版完全独立。新图标采用深蓝背景和青绿色剪贴板图案，提高浅色系统托盘上的辨识度。
 
 ## 从源码构建（Windows）
 
