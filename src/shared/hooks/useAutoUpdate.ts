@@ -16,15 +16,10 @@ export interface UpdateCheckResult {
   message?: string;
 }
 
-interface ManualUpdateRequest {
-  requestId?: string;
-}
-
 interface CheckOutcome extends UpdateCheckResult {
   update?: Update;
 }
 
-const CHECK_REQUEST_EVENT = "check-update-manually";
 export const CHECK_RESULT_EVENT = "update-check-result";
 
 // Stable builds also look at the beta channel. With "receive beta updates"

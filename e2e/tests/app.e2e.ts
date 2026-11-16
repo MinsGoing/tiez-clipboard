@@ -173,9 +173,9 @@ test('详情侧栏：粘贴按钮粘贴当前选中项', async ({ app, screen, b
   ]);
 });
 
-test('详情侧栏：开启 AI 助手后出现 AI 按钮', async ({ app, screen }) => {
+test('详情侧栏：即使旧配置曾开启 AI，本地版仍隐藏 AI 按钮', async ({ app, screen }) => {
   await app.open('/?set=ai_enabled:true');
-  await expect(screen.getByRole('complementary').getByRole('button', 'AI 助手')).toBeVisible();
+  await expect(screen.getByRole('complementary').getByRole('button', 'AI 助手')).toBeHidden();
 });
 
 test('键盘：关闭方向键选择后，↓ + Enter 不会粘贴', async ({ app, screen, browser }) => {
