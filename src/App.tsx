@@ -947,14 +947,8 @@ const App = () => {
   }, [setAppSettings]);
 
   const saveSetting = useCallback((key: string, val: string) => {
-    invoke("save_setting", { key, value: val })
-      .then(() => {
-        if (key === "app.emoji_favorites") {
-          return invoke("request_cloud_sync");
-        }
-        return undefined;
-      })
-      .catch(console.error);
+    // Local storage only. Saving emoji favorites cannot trigger cloud sync.
+    void invoke("save_setting", { key, value: val }).catch(console.error);
   }, []);
 
   const updateClipboardSortMode = useCallback(

@@ -219,28 +219,10 @@ export const useAutoUpdate = () => {
   }, [status, updateObj]);
 
   useEffect(() => {
+    // No automatic update polling of the upstream distribution.
     if (!isTauriRuntime()) return;
-
-    getReleaseBuildInfo().then((buildInfo) => {
-      setReleaseChannel(buildInfo.channel);
-    });
-
-    const timer = setTimeout(() => {
-      checkUpdate();
-    }, 5000);
-
-    let unlisten: (() => void) | undefined;
-    listen<ManualUpdateRequest>(CHECK_REQUEST_EVENT, (event) => {
-      checkUpdate(event.payload?.requestId);
-    }).then((fn) => {
-      unlisten = fn;
-    });
-
-    return () => {
-      clearTimeout(timer);
-      unlisten?.();
-    };
-  }, [checkUpdate]);
+    void getReleaseBuildInfo().then(info => setReleaseChannel(info.channel));
+  }, []);
 
   useEffect(() => {
     if (!isTauriRuntime()) return;

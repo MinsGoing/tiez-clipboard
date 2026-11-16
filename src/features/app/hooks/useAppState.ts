@@ -157,7 +157,7 @@ export const useAppState = (): AppState => {
   const [soundEnabled, setSoundEnabled] = useState(false);
   const [pasteSoundEnabled, setPasteSoundEnabled] = useState(true);
   const [soundVolume, setSoundVolume] = useState(1.0);
-  const [aiEnabled, setAiEnabled] = useState(true);
+  const [aiEnabled, setAiEnabled] = useState(false);
   const [aiTargetLang, setAiTargetLang] = useState("zh");
   const [aiProfiles, setAiProfiles] = useState<AiProfile[]>(PRESET_AI_PROFILES);
   const [aiAssignedProfileTask, setAiAssignedProfileTask] = useState("default");

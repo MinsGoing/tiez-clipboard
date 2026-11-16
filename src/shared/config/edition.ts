@@ -1,6 +1,4 @@
+/** A local-only fork: environment variables cannot re-enable cloud syncing. */
 export type AppEdition = "local" | "cloud";
-
-const rawEdition = (import.meta.env.VITE_EDITION ?? "cloud").toLowerCase();
-
-export const APP_EDITION: AppEdition = rawEdition === "local" ? "local" : "cloud";
-export const CLOUD_SYNC_ENABLED = APP_EDITION === "cloud";
+export const APP_EDITION: AppEdition = "local";
+export const CLOUD_SYNC_ENABLED = false;

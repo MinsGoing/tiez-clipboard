@@ -57,45 +57,8 @@ pub async fn check_beta_update(
     webview: tauri::Webview,
     include_stable: bool,
 ) -> Result<Option<BetaUpdateMetadata>, String> {
-    use tauri::Manager;
-    use tauri_plugin_updater::UpdaterExt;
-
-    let endpoint = webview
-        .config()
-        .plugins
-        .0
-        .get("updater")
-        .and_then(|updater| updater.get("endpoints"))
-        .and_then(|endpoints| endpoints.get(0))
-        .and_then(|endpoint| endpoint.as_str())
-        .ok_or_else(|| "no update endpoint configured".to_string())?;
-    let url = tauri::Url::parse(&beta_endpoint(endpoint)).map_err(|e| e.to_string())?;
-    let update = webview
-        .updater_builder()
-        .endpoints(vec![url])
-        .map_err(|e| e.to_string())?
-        .header("Cache-Control", "no-cache")
-        .map_err(|e| e.to_string())?
-        .timeout(std::time::Duration::from_secs(10))
-        .build()
-        .map_err(|e| e.to_string())?
-        .check()
-        .await
-        .map_err(|e| e.to_string())?;
-
-    let Some(update) = update else { return Ok(None) };
-    // SemVer pre-releases carry a "-" (1.0.0-beta.5).
-    if !include_stable && !update.version.contains('-') {
-        return Ok(None);
-    }
-    Ok(Some(BetaUpdateMetadata {
-        current_version: update.current_version.clone(),
-        version: update.version.clone(),
-        date: None,
-        body: update.body.clone(),
-        raw_json: update.raw_json.clone(),
-        rid: webview.resources_table().add(update),
-    }))
+    let _ = (webview, include_stable);
+    Ok(None)
 }
 
 #[cfg(test)]

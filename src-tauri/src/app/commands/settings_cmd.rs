@@ -128,6 +128,10 @@ pub fn save_setting(
     key: String,
     value: String,
 ) -> AppResult<()> {
+    // Previous settings must not reactivate removed network functionality.
+    if key.starts_with("mqtt_") || key.starts_with("cloud_sync_") || key.starts_with("ai_") {
+        return Ok(());
+    }
     match key.as_str() {
         "app.arrow_key_selection" => {
             settings_state
@@ -572,9 +576,7 @@ pub fn get_mqtt_running() -> bool {
 }
 
 #[tauri::command]
-pub fn restart_mqtt_client(app_handle: AppHandle) {
-    crate::services::mqtt_sub::restart_mqtt_client(app_handle)
-}
+pub fn restart_mqtt_client(_app_handle: AppHandle) {}
 
 #[tauri::command]
 pub fn get_cloud_sync_status() -> crate::services::cloud_sync::CloudSyncStatus {
@@ -582,14 +584,10 @@ pub fn get_cloud_sync_status() -> crate::services::cloud_sync::CloudSyncStatus {
 }
 
 #[tauri::command]
-pub fn restart_cloud_sync_client(app_handle: AppHandle) {
-    crate::services::cloud_sync::restart_cloud_sync_client(app_handle);
-}
+pub fn restart_cloud_sync_client(_app_handle: AppHandle) {}
 
 #[tauri::command]
-pub fn request_cloud_sync(app_handle: AppHandle) {
-    crate::services::cloud_sync::request_cloud_sync(app_handle);
-}
+pub fn request_cloud_sync(_app_handle: AppHandle) {}
 
 #[tauri::command]
 pub fn stop_cloud_sync_client(app_handle: AppHandle) {
@@ -600,7 +598,8 @@ pub fn stop_cloud_sync_client(app_handle: AppHandle) {
 pub async fn cloud_sync_now(
     app_handle: AppHandle,
 ) -> AppResult<crate::services::cloud_sync::CloudSyncStatus> {
-    crate::services::cloud_sync::cloud_sync_now(app_handle).await
+    let _ = app_handle;
+    Ok(crate::services::cloud_sync::get_cloud_sync_status())
 }
 
 #[tauri::command]

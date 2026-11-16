@@ -380,26 +380,18 @@ export const useSettingsPostInit = ({
       setLightModeIdleMinutes(Number.isFinite(mins) ? Math.min(240, Math.max(1, mins)) : 15);
     }
 
-    setMqttEnabled(settings["mqtt_enabled"] === "true");
+    setMqttEnabled(false);
     setMqttServer(settings["mqtt_server"] || "");
 
     setMqttPort(settings["mqtt_port"] || "1883");
     setMqttUser(settings["mqtt_username"] || "");
     setMqttPass(settings["mqtt_password"] || "");
-    if (settings["mqtt_topic"]) {
-      setMqttTopic(settings["mqtt_topic"]);
-    } else {
-      // Same shape as the topic the MQTT client creates (128 random bits),
-      // saved now so the pairing QR shows the topic the client will use.
-      const bytes = crypto.getRandomValues(new Uint8Array(16));
-      const topic = `tiez/tiez_${Array.from(bytes, (b) => b.toString(16).padStart(2, "0")).join("")}`;
-      setMqttTopic(topic);
-      invoke("save_setting", { key: "mqtt_topic", value: topic }).catch(console.error);
-    }
+    // Never generate a pairing token in this local-only edition.
+    setMqttTopic(settings["mqtt_topic"] || "");
     setMqttProtocol(settings["mqtt_protocol"] || "mqtt://");
     setMqttWsPath(settings["mqtt_ws_path"] || "/mqtt");
     setMqttNotificationEnabled(settings["mqtt_notification_enabled"] !== "false");
-    setCloudSyncEnabled(settings["cloud_sync_enabled"] === "true");
+    setCloudSyncEnabled(false);
     setCloudSyncAuto(settings["cloud_sync_auto"] !== "false");
     setCloudSyncProvider(settings["cloud_sync_provider"] === "http" ? "http" : "webdav");
     setCloudSyncServer(settings["cloud_sync_server"] || "");
@@ -450,7 +442,7 @@ export const useSettingsPostInit = ({
         setSoundVolume(Math.max(0, volume > 1 ? Math.min(volume, 100) / 100 : volume));
       }
     }
-    if (settings["ai_enabled"]) setAiEnabled(settings["ai_enabled"] === "true");
+    setAiEnabled(false);
     if (settings["ai_target_lang"]) setAiTargetLang(settings["ai_target_lang"]);
     if (settings["app.window_pinned"] === "true") {
       setIsWindowPinned(true);
