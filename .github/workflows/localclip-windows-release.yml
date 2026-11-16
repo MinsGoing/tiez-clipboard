@@ -1,0 +1,104 @@
+name: LocalClip Windows preview build and release
+
+on:
+  push:
+    branches:
+      - local-only-remove-sync-ai
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: localclip-preview-windows
+  cancel-in-progress: false
+
+jobs:
+  build-and-publish:
+    name: Windows x64 installer
+    if: github.repository == 'MinsGoing/tiez-clipboard'
+    runs-on: windows-latest
+    timeout-minutes: 120
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+
+      - name: Install Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+
+      - name: Install Rust stable
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: x86_64-pc-windows-msvc
+
+      - uses: Swatinem/rust-cache@v2
+        with:
+          workspaces: src-tauri
+
+      - name: Install JavaScript dependencies
+        run: npm ci
+
+      # Do NOT run scripts/configure-release.mjs: it restores the upstream updater.
+      - name: Apply local Windows version
+        run: node scripts/apply-app-version.mjs windows stable
+
+      - name: Verify fork identity and disabled updater
+        shell: pwsh
+        run: |
+          $config = Get-Content 'src-tauri/tauri.conf.json' -Raw | ConvertFrom-Json
+          if ($config.productName -ne 'LocalClip') { throw 'Unexpected product name' }
+          if ($config.identifier -ne 'com.minsgoing.localclip') { throw 'Unexpected application identifier' }
+          if ($config.plugins.PSObject.Properties.Name -contains 'updater') { throw 'Upstream updater must stay disabled' }
+          if ($config.bundle.createUpdaterArtifacts -ne $false) { throw 'Updater artifacts must stay disabled' }
+
+      - name: Build frontend
+        run: npm run build
+
+      - name: Run frontend tests
+        run: npm test
+
+      - name: Lint source
+        run: npm run lint
+
+      - name: Build Windows NSIS installer
+        run: npx tauri build --config src-tauri/tauri.windows.conf.json
+
+      - name: Stage installer and SHA-256
+        shell: pwsh
+        run: |
+          $items = @(Get-ChildItem 'src-tauri/target/release/bundle/nsis' -Filter '*-setup.exe' -File -Recurse)
+          if ($items.Count -ne 1) { throw "Expected exactly one NSIS installer, got $($items.Count)" }
+          $out = Join-Path $env:RUNNER_TEMP 'localclip-release'
+          New-Item -ItemType Directory -Force -Path $out | Out-Null
+          $name = 'LocalClip_1.0.0_preview1_x64_setup.exe'
+          $destination = Join-Path $out $name
+          Copy-Item $items[0].FullName $destination
+          $hash = (Get-FileHash $destination -Algorithm SHA256).Hash.ToLowerInvariant()
+          "$hash  $name" | Out-File -Encoding utf8 (Join-Path $out "$name.sha256")
+
+      - name: Preserve CI build artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: localclip-preview1-windows-x64
+          if-no-files-found: error
+          path: ${{ runner.temp }}/localclip-release/*
+
+      - name: Publish preview Release to this fork only
+        shell: pwsh
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          if ($env:GITHUB_REPOSITORY -ne 'MinsGoing/tiez-clipboard') { throw 'Refusing to publish outside user fork' }
+          $tag = 'localclip-v1.0.0-preview.1'
+          $found = @(gh release list --repo $env:GITHUB_REPOSITORY --limit 100 --json tagName --jq '.[].tagName')
+          if ($LASTEXITCODE -ne 0) { throw 'Cannot query existing Releases' }
+          if ($found -contains $tag) { throw "Tag $tag was already released: refusing to replace published binaries" }
+          $out = Join-Path $env:RUNNER_TEMP 'localclip-release'
+          $exe = Join-Path $out 'LocalClip_1.0.0_preview1_x64_setup.exe'
+          $sum = "$exe.sha256"
+          gh release create $tag $exe $sum --repo $env:GITHUB_REPOSITORY --target $env:GITHUB_SHA --title 'LocalClip v1.0.0 Preview 1 (Windows x64)' --notes-file RELEASE_NOTES_LOCALCLIP.md --prerelease --latest=false
+          if ($LASTEXITCODE -ne 0) { throw 'GitHub Release publication failed' }

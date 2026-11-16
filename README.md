@@ -1,130 +1,48 @@
-<p align="left">
-  <img src="docs/images/logo.png" width="32" vertical-align="middle" />
-  <b>Making fragmented information flow effortlessly.</b>
-</p>
+# LocalClip
 
----
+LocalClip is a **local-first clipboard manager** for Windows, based on the open-source [TieZ project](https://github.com/jimuzhe/tiez-clipboard). This fork is independent and **is not an official TieZ release**.
 
-<div align="center">
-  <img src="docs/images/logo.png" alt="TieZ Hero Logo" width="300" />
+[简体中文](./README.zh-CN.md) · [Downloads (this fork)](https://github.com/MinsGoing/tiez-clipboard/releases)
 
-  ### **STAY FAST. STAY SYNCED.**
+## Features
 
-  | STARS | VERSION | LICENSE | PLATFORM |
-  | :--- | :--- | :--- | :--- |
-  | [![Stars](https://img.shields.io/github/stars/jimuzhe/tiez-clipboard?label=STARS&style=for-the-badge&color=4CAF50)](https://github.com/jimuzhe/tiez-clipboard/stargazers) | [![Version](https://img.shields.io/github/v/release/jimuzhe/tiez-clipboard?label=VERSION&style=for-the-badge&color=2196F3)](https://github.com/jimuzhe/tiez-clipboard/releases) | [![License](https://img.shields.io/badge/LICENSE-GPL--3.0-FF9800?style=for-the-badge)](https://www.gnu.org/licenses/gpl-3.0) | [![Platform](https://img.shields.io/badge/PLATFORM-macOS-f44336?style=for-the-badge)](https://github.com/jimuzhe/tiez-clipboard/releases) |
+- Clipboard history for text, rich text, images and file paths
+- Search, pinning, tags, history cleanup and sequential paste
+- Global shortcuts, customizable appearance, light/dark themes and privacy masking
+- Local data storage and backup / import tools
+- Optional LAN file transfer, enabled from Settings
 
-  [English](./README.md) | [简体中文](./README.zh-CN.md)
-</div>
+## Changes from upstream
 
----
+This edition removes the **AI assistant**, **MQTT/verification-code synchronization** and **WebDAV/cloud synchronization** interfaces, and disables their backend requests. It also disables the upstream announcement ping, analytics reporting and automatic updater. These features are **not available** in this edition.
 
-<div align="center">
+LAN file transfer remains available as an opt-in feature. Other actions such as opening external links, fetching online themes or previewing remote content can still access the network. This is not an offline sandbox.
 
-## Theme Gallery
+## Download and installation
 
-Eight built-in themes; four of them:
+Download the Windows x64 installer from **[Releases in this fork](https://github.com/MinsGoing/tiez-clipboard/releases)**. Initial builds are designated *preview* and are published only after the Windows build and automated checks pass. No installer is provided by the upstream project's website for this fork.
 
-  <table>
-    <tr>
-      <td align="center"><b>Frosted</b><br><img src="docs/images/毛玻璃.png" width="220" /></td>
-      <td align="center"><b>Paper</b><br><img src="docs/images/书.png" width="220" /></td>
-      <td align="center"><b>Sticky</b><br><img src="docs/images/便利贴.png" width="220" /></td>
-      <td align="center"><b>Retro</b><br><img src="docs/images/3d.png" width="220" /></td>
-    </tr>
-  </table>
-</div>
+The installer is not code-signed; Windows may display a publisher/SmartScreen warning. Verify the downloadable SHA-256 checksum before installing. The application ID is `com.minsgoing.localclip`, distinct from upstream TieZ.
 
----
+## Build from source
 
-## Why TieZ?
+Requirements: Node.js 22, Rust stable, Microsoft C++ Build Tools, WebView2 and Tauri 2's Windows prerequisites.
 
-| Performance | Practicality | Privacy | Sync |
-| :--- | :--- | :--- | :--- |
-| **Instant Access**<br>Native listeners and Rust core ensure absolute speed. | **Power Workflows**<br>Rich text, tags, and AI-assisted actions. | **Local & Private**<br>Local-first storage with smart masking for sensitive data in previews. | **Cloud Fluent**<br>Seamless WebDAV and MQTT cross-device sync. |
+```powershell
+npm ci
+npm run build
+npm test
+npx tauri build --config src-tauri/tauri.windows.conf.json
+```
 
----
+Installer output: `src-tauri/target/release/bundle/nsis/`.
 
-## Key Features
+Source for this version is on the [`local-only-remove-sync-ai` branch](https://github.com/MinsGoing/tiez-clipboard/tree/local-only-remove-sync-ai).
 
-### Core Experience
-- **Native Efficiency**: Built with Tauri 2 and Rust for minimum memory footprint.
-- **Smart Capture**: Automatically collects text, rich text (HTML), images, and file paths.
-- **Modern UI**: Supports Mica/Acrylic effects and Dark/Light modes with **4 elegant theme styles**.
-- **Edge Docking**: Automatically hides at the screen edge to stay out of your way.
+## Privacy and data
 
-### Management & Enhancements
-- **Tag System**: Organize your history with custom multi-color tags.
-- **Emoji Library**: Comprehensive built-in emoji management for quick access.
-- **Advanced Settings**: Granular control over cleanup rules and app behavior.
-- **Privacy Masking**: Auto-masks sensitive info like IDs and phone numbers in previews.
+Clipboard history is stored locally. Legacy sync or AI credentials may remain in an existing local database after an upgrade, but the disabled services do not use them. If you enable LAN transfer, a local network service is started; a previously enabled setting may persist. Review your firewall and network permissions as appropriate.
 
-### Networking & Transport
-- **WebDAV Sync**: Your data, your cloud. Complete cross-device history.
-- **LAN File Transfer**: Seamlessly move items between devices on the same network.
-- **Verifcation Code Sync**: Instant transfer of OTP codes to your active device.
-- **MQTT Connectivity**: Optimized for real-time synchronization between devices.
+## License and attribution
 
-### Productivity Tools
-- **External Collaboration**: Open items in external editors with auto-sync back.
-- **Global Search**: Find anything by content, source app, or date.
-- **Sequential Paste**: Optimized workflow for high-frequency copy-paste tasks.
-
----
-
-## Installation
-
-### Platform Support
-| Platform | Requirement | Output |
-| :--- | :--- | :--- |
-| **macOS** | macOS 10.15+ <br>(Apple Silicon / Intel) | `.dmg` / `.app` |
-
-[**Download TieZ →**](https://tiez.name666.top/)
-
-Beta builds are on [Releases](https://github.com/jimuzhe/tiez-clipboard/releases).
-
----
-
-## Star History
-
-<div align="center">
-  <a href="https://star-history.com/#jimuzhe/tiez-clipboard&Date">
-    <img src="https://api.star-history.com/svg?repos=jimuzhe/tiez-clipboard&type=Date" alt="Star History Chart" width="800" />
-  </a>
-</div>
-
----
-
-## Community & Support
-
-If TieZ makes your life easier, consider supporting the journey.
-
-<div align="center">
-  <table style="border: none;">
-    <tr>
-      <td align="center" style="border: none;">
-        <p><strong>WeChat</strong></p>
-        <img src="docs/images/wx.jpeg" alt="WeChat" width="180" height="180" />
-      </td>
-      <td align="center" style="border: none;">
-        <p><strong>Alipay</strong></p>
-        <img src="docs/images/zfb.jpeg" alt="Alipay" width="180" height="180" />
-      </td>
-      <td align="center" style="border: none;">
-        <p><strong>QQ Group</strong></p>
-        <img src="docs/images/qq.jpeg" alt="QQ Group" width="180" height="180" />
-      </td>
-    </tr>
-  </table>
-  <br>
-  <p>Your support keeps the project active and the developer caffeinated!</p>
-  <a href="https://tiez.name666.top/zh/sponsors.html"><strong>View Sponsor List</strong></a>
-</div>
-
----
-
-<div align="center">
-  Built with technical precision for every efficient developer.
-  <br>
-  <b>Please consider leaving a Star if you find this project useful.</b>
-</div>
+Derived from [TieZ by jimuzhe](https://github.com/jimuzhe/tiez-clipboard), retaining its **GPL-3.0** license and copyright notices. This independent fork has no affiliation with the original developer.
