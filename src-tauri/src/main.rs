@@ -58,7 +58,7 @@ fn main() -> AppResult<()> {
 
     let context = tauri::generate_context!();
 
-    // A normal start while TieZ runs as administrator: the single-instance
+    // A normal start while LocalClip runs as administrator: the single-instance
     // plugin can't reach that instance (see single_instance.rs).
     #[cfg(target_os = "windows")]
     {
@@ -121,7 +121,7 @@ fn main() -> AppResult<()> {
     let builder = builder.plugin(tauri_nspanel::init());
 
     let app = builder
-        // Launching TieZ again brings the running instance forward: the way
+        // Launching LocalClip again brings the running instance forward: the way
         // back when the tray icon is hidden and the hotkey is forgotten.
         // Off the callback thread: on Windows it runs inside the second
         // process's WM_COPYDATA SendMessage, where rebuilding the WebView2
@@ -129,7 +129,7 @@ fn main() -> AppResult<()> {
         .plugin(tauri_plugin_single_instance::init(|app, args, _cwd| {
             // A login-item start (--minimized / --autostart) is not the user
             // asking for the window. On macOS, registering the login item
-            // starts one right away while TieZ is already running.
+            // starts one right away while LocalClip is already running.
             if args.iter().any(|arg| arg == "--minimized" || arg == "--autostart") {
                 return;
             }

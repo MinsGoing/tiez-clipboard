@@ -7,7 +7,7 @@ use std::os::windows::process::CommandExt;
 use std::process::Command;
 use std::time::Duration;
 
-const TASK_NAME: &str = r"TieZ\ElevatedAutostart";
+const TASK_NAME: &str = r"LocalClip\ElevatedAutostart";
 const CREATE_NO_WINDOW: u32 = 0x0800_0000;
 /// Passed by the task, so an instance it started never hands off to it again.
 pub const TASK_ARG: &str = "--elevated-autostart";
@@ -34,7 +34,7 @@ fn xml_escape(value: &str) -> String {
 
 /// The task as XML. `schtasks /Create /SC ONLOGON` keeps Task Scheduler's
 /// defaults, which broke "start as administrator": no start on battery (a
-/// laptop unplugged at logon never got an elevated TieZ, so users opened a
+/// laptop unplugged at logon never got an elevated LocalClip, so users opened a
 /// normal one), killed on unplugging or after 72 hours, below-normal priority.
 fn task_xml(exe: &str, user: &str) -> String {
     let exe = xml_escape(exe);
@@ -117,7 +117,7 @@ pub fn is_task_current() -> bool {
 }
 
 /// Tasks made by older versions keep their bad defaults until rewritten,
-/// which needs admin rights: done whenever TieZ runs elevated.
+/// which needs admin rights: done whenever LocalClip runs elevated.
 pub fn refresh_outdated_task() {
     if is_elevated_autostart_installed() && !is_task_current() {
         if let Err(error) = install_elevated_autostart_task() {
@@ -126,7 +126,7 @@ pub fn refresh_outdated_task() {
     }
 }
 
-/// An admin whose TieZ is running with the limited token (UAC split token):
+/// An admin whose LocalClip is running with the limited token (UAC split token):
 /// the task can start an elevated one without a prompt.
 fn can_elevate_through_task() -> bool {
     use std::ffi::c_void;
@@ -156,7 +156,7 @@ fn can_elevate_through_task() -> bool {
     }
 }
 
-/// A login started TieZ without admin rights although "start as
+/// A login started LocalClip without admin rights although "start as
 /// administrator" is on (something else launched it first, or the old task
 /// didn't run): start the task instead and let this instance exit. Only with
 /// a task of this version, so the elevated start can't be blocked on battery,
@@ -190,7 +190,7 @@ pub fn install_elevated_autostart_task() -> Result<(), String> {
     // schtasks wants the file in the encoding the declaration names.
     let mut bytes = vec![0xFF, 0xFE];
     bytes.extend(xml.encode_utf16().flat_map(u16::to_le_bytes));
-    let xml_path = std::env::temp_dir().join(format!("tiez-autostart-{}.xml", std::process::id()));
+    let xml_path = std::env::temp_dir().join(format!("localclip-autostart-{}.xml", std::process::id()));
     std::fs::write(&xml_path, bytes).map_err(|e| format!("writing the task failed: {e}"))?;
     let status = Command::new("schtasks")
         .args(["/Create", "/TN", TASK_NAME, "/XML"])
@@ -234,8 +234,7 @@ pub fn clear_registry_run_entry() -> Result<(), String> {
             KEY_WRITE | KEY_READ,
         )
         .map_err(|e| e.to_string())?;
-    let _ = key.delete_value("TieZ");
-    let _ = key.delete_value("tie-z");
+    let _ = key.delete_value("LocalClip");
     Ok(())
 }
 
@@ -250,7 +249,7 @@ pub fn write_registry_run_entry() -> Result<(), String> {
         )
         .map_err(|e| e.to_string())?;
     let cmd = task_command_line()?;
-    key.set_value("TieZ", &cmd).map_err(|e| e.to_string())
+    key.set_value("LocalClip", &cmd).map_err(|e| e.to_string())
 }
 
 pub fn registry_run_present() -> bool {
@@ -260,7 +259,7 @@ pub fn registry_run_present() -> bool {
     let Ok(key) = hkcu.open_subkey("Software\\Microsoft\\Windows\\CurrentVersion\\Run") else {
         return false;
     };
-    key.get_value::<String, _>("TieZ").is_ok() || key.get_value::<String, _>("tie-z").is_ok()
+    key.get_value::<String, _>("LocalClip").is_ok()
 }
 
 /// Relaunch this exe elevated to install/uninstall the task (one UAC prompt).
@@ -340,12 +339,12 @@ mod tests {
 
     #[test]
     fn task_runs_on_battery_without_time_limit() {
-        let xml = task_xml(r"C:\Program Files\R&D <TieZ>\tiez-app.exe", r"PC\User");
+        let xml = task_xml(r"C:\Program Files\R&D <LocalClip>\tiez-app.exe", r"PC\User");
         assert!(xml.contains("<DisallowStartIfOnBatteries>false</DisallowStartIfOnBatteries>"));
         assert!(xml.contains("<StopIfGoingOnBatteries>false</StopIfGoingOnBatteries>"));
         assert!(xml.contains("<ExecutionTimeLimit>PT0S</ExecutionTimeLimit>"));
         assert!(xml.contains("<RunLevel>HighestAvailable</RunLevel>"));
-        assert!(xml.contains(r"<Command>C:\Program Files\R&amp;D &lt;TieZ&gt;\tiez-app.exe</Command>"));
+        assert!(xml.contains(r"<Command>C:\Program Files\R&amp;D &lt;LocalClip&gt;\tiez-app.exe</Command>"));
         assert!(xml.contains(&format!("<Arguments>--minimized {TASK_ARG}</Arguments>")));
         assert!(xml.contains(r"<UserId>PC\User</UserId>"));
     }
