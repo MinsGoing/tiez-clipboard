@@ -48,17 +48,24 @@ for (const [source, value] of [
   }
 }
 
-const endpoint = tauriConfig.plugins?.updater?.endpoints?.[0] || "";
-for (const placeholder of ["{{target}}", "{{arch}}", "{{current_version}}"]) {
-  if (!endpoint.includes(placeholder)) {
-    fail(`updater endpoint is missing ${placeholder}`);
+// LocalClip is independently packaged: requiring an upstream updater here
+// would reintroduce the network capability that this fork deliberately removed.
+if (tauriConfig.identifier === "com.minsgoing.localclip") {
+  if (tauriConfig.plugins?.updater) fail("LocalClip must not configure an upstream updater");
+  if (tauriConfig.bundle?.createUpdaterArtifacts !== false) fail("LocalClip updater artifacts must be disabled");
+} else {
+  const endpoint = tauriConfig.plugins?.updater?.endpoints?.[0] || "";
+  for (const placeholder of ["{{target}}", "{{arch}}", "{{current_version}}"]) {
+    if (!endpoint.includes(placeholder)) {
+      fail(`updater endpoint is missing ${placeholder}`);
+    }
   }
-}
-if (!endpoint.startsWith("https://")) {
-  fail("updater endpoint must use HTTPS");
-}
-if (!endpoint.includes(`channel=${channel}`)) {
-  fail(`updater endpoint does not target the ${channel} channel`);
+  if (!endpoint.startsWith("https://")) {
+    fail("updater endpoint must use HTTPS");
+  }
+  if (!endpoint.includes(`channel=${channel}`)) {
+    fail(`updater endpoint does not target the ${channel} channel`);
+  }
 }
 
 const tag = (process.env.GITHUB_REF_NAME || "").trim();

@@ -11,6 +11,19 @@ if (applyVersion.status !== 0) {
   process.exit(applyVersion.status ?? 1);
 }
 
+// This fork does not use the upstream update or telemetry infrastructure.
+// Never restore the upstream updater, even if stale CI variables are present.
+const localConfigPath = resolve("src-tauri/tauri.conf.json");
+const localConfig = JSON.parse(readFileSync(localConfigPath, "utf8"));
+if (localConfig.identifier === "com.minsgoing.localclip") {
+  if (localConfig.plugins?.updater || localConfig.bundle?.createUpdaterArtifacts !== false) {
+    console.error("[configure-release] LocalClip must not configure remote updates");
+    process.exit(1);
+  }
+  console.log("[configure-release] LocalClip build: updater and analytics remain disabled");
+  process.exit(0);
+}
+
 const isCi = process.env.GITHUB_ACTIONS === "true" || process.env.CI === "true";
 
 const requiredInCi = [

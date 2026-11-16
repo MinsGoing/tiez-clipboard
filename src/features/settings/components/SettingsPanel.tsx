@@ -332,7 +332,7 @@ const SettingsPanel = (props: SettingsPanelProps) => {
         clipboardItemFontSize, setClipboardItemFontSize, clipboardTagFontSize, setClipboardTagFontSize,
         emojiPanelEnabled, setEmojiPanelEnabled, tagManagerEnabled, setTagManagerEnabled,
         setFileServerEnabled, setFileServerPort, setFileTransferAutoOpen, setShowAutoCloseHint, setFileServerAutoClose, setFileTransferAutoCopy, fetchEffectiveTransferPath,
-        setShowAppSelector, handleResetSettings,
+        setShowAppSelector, handleResetSettings, saveSetting,
         onOpenChat,
     } = props;
 
