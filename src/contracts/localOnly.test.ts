@@ -17,6 +17,11 @@ describe("local-only invariant checks", () => {
         expect(setup).not.toContain("cloud_sync::start_cloud_sync_client(");
         expect(setup).not.toContain("fn init_analytics(");
     });
+    test("AI profile initialization does not persist credentials", () => {
+        const source = file("src/shared/hooks/useSettingsPostInit.ts");
+        expect(source).not.toContain('key: "ai_profiles"');
+        expect(source).toContain("setAiEnabled(false)");
+    });
     test("announcements have no automatic ping", () => {
         const announcements = file("src/shared/hooks/useAnnouncements.ts");
         expect(announcements).not.toContain("get_ping_id");
